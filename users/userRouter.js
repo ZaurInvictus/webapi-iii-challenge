@@ -5,6 +5,7 @@ const Posts =  require('../posts/postDb')
 const router = express.Router();
 
 
+
 router.post('/', (req, res) => {
    
 });
@@ -27,22 +28,8 @@ router.get('/', async (req, res) => {
 
 
 
-router.get('/:id', async (req, res) => {
-  try {
-    const hub = await Users.getById(req.params.id);
-
-    if (hub) {
-      res.status(200).json(hub);
-    } else {
-      res.status(404).json({ message: 'Hub not found' });
-    }
-  } catch (error) {
-    // log error to server
-    console.log(error);
-    res.status(500).json({
-      message: 'Error retrieving the hub',
-    });
-  }
+router.get('/:id', [validateUserId], (req, res) => {
+   res.status(200).json(req.user)
 });
 
 
@@ -59,10 +46,24 @@ router.put('/:id', (req, res) => {
 
 });
 
-//custom middleware
+
+
+//CUSTOM MIDDLEWARE
 
 function validateUserId(req, res, next) {
+  const { id } = req.params
 
+  Users.getById(id)
+  .then(user => {
+    if(user) {
+      req.user = user
+      next()
+    } else {
+      res.status(400).json({
+        message: "invalid user id" 
+      })
+    }
+  })
 };
 
 function validateUser(req, res, next) {
