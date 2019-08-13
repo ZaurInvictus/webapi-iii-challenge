@@ -72,8 +72,20 @@ router.delete('/:id', (req, res) => {
 
 // UPDATE
 router.put('/:id', (req, res) => {
-
-});
+  Users.update(req.params.id, req.body)
+  .then(user => {
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      res.status(404).json({ message: 'User could not be found' });
+    }
+  })
+  .catch(() => {
+    res.status(500).json({
+      message: 'Error updating the user',
+    })
+  })
+})
 
 
 
