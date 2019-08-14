@@ -89,7 +89,7 @@ router.put('/:id', (req, res) => {
 
 
 
-//CUSTOM MIDDLEWARE
+// CUSTOM MIDDLEWARE
 
 // VALIDATE USER ID
 function validateUserId(req, res, next) {
@@ -111,20 +111,42 @@ function validateUserId(req, res, next) {
 
 // VALIDATE USER 
 function validateUser(req, res, next) {
-  const { name } = req.body;
-  if (!name) {
-    res.status(400).json({ error: "Include Name" });
-    next();
-  } else {
-    next();
+  if (req.body === undefined || Object.keys(req.body).length === 0) {
+    res.status(400).json({
+      message: "missing user data"
+    });
+    return
   }
-};
+
+  if (req.body.name === undefined) {
+    res.status(400).json({
+      message: "missing required name field"
+    })
+    return
+  }
+
+  next()
+}
 
 
-// VALIDATE POST
-// function validatePost(req, res, next) {
+  // VALIDATE POST
+ function validatePost(req, res, next) {
+   if(req.body === undefined || Object.keys(req.body).length === 0) {
+     res.status(400)({
+       message: "missing post data"
+     })
+     return
+   }
 
-// };
+   if(req.body.text === undefined) {
+     res.status(400).json({
+       message: "missing required text field"
+     })
+     return
+   }
+
+  next()
+ };
 
 module.exports = router;
 
