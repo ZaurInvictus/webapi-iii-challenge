@@ -6,25 +6,36 @@ const router = express.Router();
 
 
 // POST 
-router.post('/', (req, res) => {
+router.post('/', validateUser, (req, res) => {
   Users.insert(req.body)
   .then(user => {
     res.status(201).json(user);
   })
   .catch(error => {
-    // log error to server
-    console.log(error);
     res.status(500).json({
-      message: 'Error adding the hub',
+      message: 'Internal server error',
     });
   });
 });
 
 
-// POST BY ID
-// router.post('/:id/posts', (req, res) => {
-  
-// });
+// POST BY ID 
+router.post('/:id/posts', validateUserId, (req, res) => {
+ const newPost = {...req.body, user_id: req.params.id }
+
+  Posts.insert(newPost)
+  .then(post => {
+     res.status(201).json(post)
+  })
+  .catch((error) => {
+    res.status(500).json({
+      message: 'Internal server error'
+    })
+  })
+
+});
+
+
 
 
 //GET USERS
@@ -45,14 +56,24 @@ router.get('/:id', [validateUserId], (req, res) => {
 });
 
 
-// GET POST BY ID
-// router.get('/:id/posts', [validateUserId], (req, res) => {
-//   res.status(200).json(req.user)
-// });
+//GET POST BY ID
+router.get('/:id/posts', [validateUserId], (req, res) => {
+  const id = req.params.id
+
+  Users.getUserPosts(id)
+  .then(post => {
+    res.status(200).json(post)
+  })
+  .catch(error => {
+    res.status(500).json({
+      error: 'Internal server error'
+    })
+  })
+})
 
 
 // DELETE
-router.delete('/:id', (req, res) => {
+router.delete('/:id',  validateUserId, (req, res) => {
   Users.remove(req.params.id)
   .then(count => {
     if (count > 0) {
